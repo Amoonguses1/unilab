@@ -1,0 +1,6 @@
+numpy==1.22.3
+matplotlib==3.7.1
+
+
+PyAudio==0.2.13
+sounddevice==0.4.6
