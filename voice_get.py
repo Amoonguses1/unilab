@@ -2,21 +2,16 @@ import sounddevice as sd
 import numpy as np
 from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
+import scipy.io.wavfile
+import wav_to_string
 
-device_list = sd.query_devices()
-print(device_list)
-
-
-def callback(indata, frames, time, status):
+def callback(indata, frames, time_name, status):
     def savefunc(data):
         global count
         global name_count
-        fig_, ax_ = plt.subplots()
-        line_, = ax_.plot(data)
-        ax_.set_ylim([-1.0, 1.0])
-        ax_.set_xlim([0, length])
-        ax_.yaxis.grid(True)
-        fig_.savefig("hoge"+str(name_count))
+        filename = "hoge.wav"
+        scipy.io.wavfile.write(filename, rate=44100, data=data.astype(np.int16))
+        print(wav_to_string.wavToString(filename))
         name_count += 1
         count = 0
     # indata.shape=(n_samples, n_channels)
@@ -27,7 +22,7 @@ def callback(indata, frames, time, status):
     shift = len(data)
     if count == 0:
         for val in data:
-            if(val > 0.05):
+            if(val > 500):
                 print("utter")
                 count += 1
                 flag = True
@@ -55,14 +50,14 @@ count = 0
 name_count = 0
 fig, ax = plt.subplots()
 line, = ax.plot(plotdata)
-ax.set_ylim([-1.0, 1.0])
+ax.set_ylim([-1000, 1000])
 ax.set_xlim([0, length])
 ax.yaxis.grid(True)
 fig.tight_layout()
 
 stream = sd.InputStream(
         channels=1,
-        dtype='float32',
+        dtype='int16',
         callback=callback
     )
 ani = FuncAnimation(fig, update_plot, interval=30, blit=True)
