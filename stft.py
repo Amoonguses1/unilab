@@ -6,7 +6,8 @@ import librosa.display as disp
 # ref: https://qiita.com/lilacs/items/a331a8933ec135f63ab1
 
 # data load
-data, sample_rate = librosa.load("meian_0000.wav")
+audio_file = "" # write the path of the .wav file
+data, sample_rate = librosa.load(audio_file)
 # spectrogram
 stft_data = librosa.stft(data.astype(np.float32))
 Sdb = librosa.amplitude_to_db(np.abs(stft_data))

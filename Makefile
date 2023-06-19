@@ -1,43 +1,35 @@
-PROJECT_NAME=fortests
-USER=unilab
+PROJECT_NAME=template
+FILE_NAME=python_3_10
+USER=haruki
 IMAGE_NAME=${USER}_${PROJECT_NAME}
 CONTAINER_NAME=${USER}_${PROJECT_NAME}
-PORT=8888
+PORT=8887
 SHM_SIZE=2g
 FORCE_RM=true
+
 build:
 	docker build \
-		--build-arg USER_ID=$(shell id -u) \
-		--build-arg GROUP_ID=$(shell id -g) \
-		-f docker/Dockerfile \
-		-t ${IMAGE_NAME} \
-		--force-rm=${FORCE_RM}\
+		-f $(FILE_NAME)/Dockerfile \
+		-t $(IMAGE_NAME) \
+			--no-cache \
+		--force-rm=$(FORCE_RM) \
 		.
-
-restart: stop run
+restart: stop start
 
 run:
 	docker run \
 		-dit \
-		--gpus all \
-		-v $(PWD):/workspace \
+		-v C:\Users\1019k\Desktop\lab\unilab:/workspace \
+		-p $(PORT):$(PORT) \
 		--name $(CONTAINER_NAME) \
 		--rm \
 		--shm-size $(SHM_SIZE) \
-		--platform=linux/amd64 \
 		$(IMAGE_NAME)
+
+stop:
+	docker stop $(IMAGE_NAME)
 
 exec:
 	docker exec \
 		-it \
 		$(CONTAINER_NAME) bash 
-
-stop:
-	docker stop $(IMAGE_NAME)
-
-run_jupyter:
-	jupyter nbextension enable --py widgetsnbextension
-	jupyter notebook --ip 0.0.0.0 --port ${PORT} --allow-root
-
-exp:
-	export PATH=$HOME/.local/bin:$PATH
