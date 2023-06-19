@@ -3,12 +3,15 @@ import numpy as np
 from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
 import scipy.io.wavfile
+import wav_to_string
 
-def callback(indata, frames, time, status):
+def callback(indata, frames, time_name, status):
     def savefunc(data):
         global count
         global name_count
-        scipy.io.wavfile.write("hoge"+str(name_count)+".wav", rate=44100, data=data.astype(np.int16))
+        filename = "hoge.wav"
+        scipy.io.wavfile.write(filename, rate=44100, data=data.astype(np.int16))
+        print(wav_to_string.wavToText(filename))
         name_count += 1
         count = 0
     # indata.shape=(n_samples, n_channels)
@@ -41,7 +44,7 @@ def update_plot(frame):
     return line,
 
 downsample = 1
-length = int(1000 * 44100 / (1000 * downsample)) * 2
+length = int(1000 * 44100 / (1000 * downsample))
 plotdata = np.zeros((length))
 count = 0
 name_count = 0
