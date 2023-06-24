@@ -4,25 +4,40 @@ from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
 import scipy.io.wavfile
 import wav_to_string
+import string_to_command
+from pykakasi import kakasi # kanji to kana
+import socket # send to unity
+
+
+# kakasi config
+kakasi = kakasi()
+kakasi.setMode('J', 'H') 
+conv = kakasi.getConverter()
+# socket config
+HOST = '127.0.0.1'
+PORT = 50007
+client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 def callback(indata, frames, time_name, status):
     def savefunc(data):
         global count
-        global name_count
+        global command
         filename = "hoge.wav"
         scipy.io.wavfile.write(filename, rate=44100, data=data.astype(np.int16))
-        print(wav_to_string.wavToString(filename))
-        name_count += 1
+        st = wav_to_string.wavToString(filename)
+        st = conv.do(st)
+        command = string_to_command.string_to_command(st)
         count = 0
     # indata.shape=(n_samples, n_channels)
     global plotdata
     global count
+    global command
     flag = False
     data = indata[::downsample, 0]
     shift = len(data)
     if count == 0:
         for val in data:
-            if(val > 500):
+            if(val > 750):
                 print("utter")
                 count += 1
                 flag = True
@@ -34,6 +49,7 @@ def callback(indata, frames, time_name, status):
             count += 1
         if count > 35:
             savefunc(plotdata)
+    print(client.sendto(command.encode('utf-8'),(HOST,PORT)))
 
 
 def update_plot(frame):
@@ -43,11 +59,11 @@ def update_plot(frame):
     line.set_ydata(plotdata)
     return line,
 
+command = "0"
 downsample = 1
 length = int(1000 * 44100 / (1000 * downsample))
 plotdata = np.zeros((length))
 count = 0
-name_count = 0
 fig, ax = plt.subplots()
 line, = ax.plot(plotdata)
 ax.set_ylim([-1000, 1000])

@@ -10,7 +10,7 @@ def wavToString(filename):
         return text
     except sr.UnknownValueError:
         print("Google Speech Recognition could not understand audio")
-        return ""
+        return "あ"
     except sr.RequestError as e:
         print("Could not request results from Google Speech Recognition service; {0}".format(e))
-        return ""
+        return "あ"
