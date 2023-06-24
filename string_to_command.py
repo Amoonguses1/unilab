@@ -1,11 +1,13 @@
 
-def string_to_command(string):
+def string_to_command(string, prev):
     if len(string) > 4:
         string = string[:4]
-    go = ["すすめ", "すすむ", "むすめ"]
-    jump = ["ジャンプ"]
-    ret = ["もどれ"]
+    go = ["まえ"]
+    jump = ["うえ"]
+    ret = ["うしろ"]
     print(string)
+    if string == "あ":
+        return prev
     if string in go:
         return "1"
     if string in ret:

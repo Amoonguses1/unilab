@@ -26,7 +26,8 @@ def callback(indata, frames, time_name, status):
         scipy.io.wavfile.write(filename, rate=44100, data=data.astype(np.int16))
         st = wav_to_string.wavToString(filename)
         st = conv.do(st)
-        command = string_to_command.string_to_command(st)
+        command = string_to_command.string_to_command(st, command)
+        print(command)
         count = 0
     # indata.shape=(n_samples, n_channels)
     global plotdata
@@ -49,7 +50,7 @@ def callback(indata, frames, time_name, status):
             count += 1
         if count > 35:
             savefunc(plotdata)
-    print(client.sendto(command.encode('utf-8'),(HOST,PORT)))
+    client.sendto(command.encode('utf-8'),(HOST,PORT))
 
 
 def update_plot(frame):
