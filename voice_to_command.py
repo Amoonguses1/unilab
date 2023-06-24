@@ -17,6 +17,9 @@ conv = kakasi.getConverter()
 HOST = '127.0.0.1'
 PORT = 50007
 client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# voice get config
+voice = {"threshold": 750, "skip": 35, "y_size": 1000}
+
 
 def callback(indata, frames, time_name, status):
     def savefunc(data):
@@ -29,7 +32,6 @@ def callback(indata, frames, time_name, status):
         command = string_to_command.string_to_command(st, command)
         print(command)
         count = 0
-    # indata.shape=(n_samples, n_channels)
     global plotdata
     global count
     global command
@@ -38,7 +40,7 @@ def callback(indata, frames, time_name, status):
     shift = len(data)
     if count == 0:
         for val in data:
-            if(val > 750):
+            if(val > voice["threshold"]):
                 print("utter")
                 count += 1
                 flag = True
@@ -48,7 +50,7 @@ def callback(indata, frames, time_name, status):
     if not flag:
         if count != 0:
             count += 1
-        if count > 35:
+        if count > voice["skip"]:
             savefunc(plotdata)
     client.sendto(command.encode('utf-8'),(HOST,PORT))
 
@@ -67,7 +69,7 @@ plotdata = np.zeros((length))
 count = 0
 fig, ax = plt.subplots()
 line, = ax.plot(plotdata)
-ax.set_ylim([-1000, 1000])
+ax.set_ylim([-1*voice["y_size"], voice["y_size"]])
 ax.set_xlim([0, length])
 ax.yaxis.grid(True)
 fig.tight_layout()
